@@ -170,3 +170,123 @@ public static String[][] cloneArrayString(String[][] src)
                 }
         m = cloneArray(m2);
     }
+    
+
+
+public Punto cercaPuntoSuccessivo(int[][] m, Punto da, Punto a)
+    {
+        int r = a.r;
+        int c = a.c;
+        int prevr = da.r;
+        int prevc = da.c;
+        if (m[r + 1][c] == 1 && !(prevr == r + 1 && prevc == c))
+            //m[r+1][c]=0;
+            return new Punto(r + 1, c);
+        if (m[r - 1][c] == 1 && !(prevr == r - 1 && prevc == c))
+            //m[r-1][c]=0;
+            return new Punto(r - 1, c);
+        if (m[r][c + 1] == 1 && !(prevr == r && prevc == c + 1))
+            //m[r][c+1]=0;
+            return new Punto(r, c + 1);
+        if (m[r][c - 1] == 1 && !(prevr == r && prevc == c - 1))
+            //m[r][c-1]=0;
+            return new Punto(r, c - 1);
+        if (m[r + 1][c + 1] == 1 && !(prevr == r + 1 && prevc == c + 1))
+            //m[r+1][c+1]=0;
+            return new Punto(r + 1, c + 1);
+        if (m[r + 1][c - 1] == 1 && !(prevr == r + 1 && prevc == c - 1))
+            //m[r+1][c-1]=0;
+            return new Punto(r + 1, c - 1);
+        if (m[r - 1][c + 1] == 1 && !(prevr == r - 1 && prevc == c + 1))
+            //m[r-1][c+1]=0;
+            return new Punto(r - 1, c + 1);
+        if (m[r - 1][c - 1] == 1 && !(prevr == r - 1 && prevc == c - 1))
+            //m[r-1][c-1]=0;
+            return new Punto(r - 1, c - 1);
+        return null;
+    }
+
+    public void cercaSequenzaPartendoDa(int[][] m, int r, int c)
+    {
+        Punto da = new Punto(r, c);
+        liste.inserisciInizio(da);
+        m[r][c] = 0;
+        Punto a = new Punto(da);
+        Punto prossimo;
+        boolean esito = false;
+        do
+        {
+            prossimo = cercaPuntoSuccessivo(m, da, a);
+            m[a.r][a.c] = 0;
+            if (prossimo != null)
+                esito = liste.provaAdAggiungere(a, prossimo);
+            da = a;
+            a = prossimo;
+        }
+        while (prossimo != null && esito);
+    }
+
+    private void creaListe(int[][] m)
+    {
+        int i, j;
+        for (i = 0; i < m.length; i++)
+            for (j = 0; j < m[i].length; j++)
+                if (m[i][j] == 1 && numeroUnoAdiacenti(i, j) == 1)
+                    cercaSequenzaPartendoDa(m, i, j);
+    }
+
+    private Punto trovaPunto(int[][] m)
+    {
+        int i, j;
+        for (i = 0; i < m.length; i++)
+            for (j = 0; j < m[0].length; j++)
+                if (m[i][j] == 1)
+                    return new Punto(i, j);
+        return null;
+    }
+
+    private void cercaECancella(int[][] m, Ausiliaria a)
+    {
+        if (m[a.r][a.c] == 0)
+            return;
+        a.sr = a.sr + a.r;
+        a.sc = a.sc + a.c;
+        a.n = a.n + 1;
+        m[a.r][a.c] = 0;
+        Punto p = new Punto(a.r, a.c);
+        cercaECancella(m, a.su(p.to(+1, +1)));
+        cercaECancella(m, a.su(p.to(+1, +0)));
+        cercaECancella(m, a.su(p.to(+1, -1)));
+        cercaECancella(m, a.su(p.to(+0, +1)));
+        cercaECancella(m, a.su(p.to(+0, -1)));
+        cercaECancella(m, a.su(p.to(-1, +1)));
+        cercaECancella(m, a.su(p.to(-1, +0)));
+        cercaECancella(m, a.su(p.to(-1, -1)));
+    }
+
+    private void creaPuntiDaRimettere()
+    {
+        puntiDiMezzo = new ArrayList<>();
+        Punto p;
+        do
+        {
+            p = trovaPunto(matriceDeiTolti);
+            if (p != null)
+            {
+                Ausiliaria a = new Ausiliaria(p);
+                cercaECancella(matriceDeiTolti, a);
+                Punto mezzo = a.puntoDiMezzo();
+                if (mezzo != null)
+                    puntiDiMezzo.add(mezzo);
+            }
+        }
+        while (p != null);
+    }
+    
+ public void sistemaListeConPuntiDiMezzo()
+    {
+        for (Punto p : puntiDiMezzo)
+            //System.out.println("p=" + p.toString());
+            for (Lista l : liste.l)
+                l.sistematiConPuntoDiMezzo(p);
+    }
