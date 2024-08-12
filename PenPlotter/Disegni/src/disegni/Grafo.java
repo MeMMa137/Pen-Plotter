@@ -137,3 +137,114 @@ public class Grafo
         }
         return -1;
     }
+    
+public void visualizzaGrafo(Grafo gr)
+    {
+        Disegni.fps.aggiungiGrafo(gr);
+    }
+
+    public void riduciAlGrafoEquivalente()
+    {
+        int daTogliere;
+        int conta = 0;
+        do
+        {
+            visualizzaGrafo(this);
+            daTogliere = cercaNodoComprimibile();
+            if (daTogliere >= 0 && pesi.length > 1)
+                rimuoviNodo(daTogliere);
+            conta++;
+        }
+        while (conta < 99999 && daTogliere >= 0 && pesi.length > 1);
+    }
+
+    void impostaPeso(double nuovoPeso, int da, int a)
+    {
+        if (da >= numeroNodi)
+            return;
+        if (a >= numeroNodi)
+            return;
+        pesi[da][a] = nuovoPeso;
+    }
+
+    void impostaPercorso(String perc, int da, int a)
+    {
+        if (da >= numeroNodi)
+            return;
+        if (a >= numeroNodi)
+            return;
+        percorsi[da][a] = perc;
+    }
+
+    double getPeso(int da, int a)
+    {
+        if (da >= numeroNodi)
+            return 0;
+        if (a >= numeroNodi)
+            return 0;
+        return pesi[da][a];
+    }
+
+    String getPercorso(int da, int a)
+    {
+        if (da >= numeroNodi)
+            return "";
+        if (a >= numeroNodi)
+            return "";
+        return percorsi[da][a];
+    }
+
+    void impostaPesiCasualmente()
+    {
+        int i, j;
+        for (i = 0; i < numeroNodi; i++)
+            for (j = 0; j < numeroNodi; j++)
+                if (i != j && Math.random() > 0.6)
+                    pesi[i][j] = Math.random() * 10;
+                else
+                    pesi[i][j] = 0.0d;
+    }
+
+    public int numeroNodi()
+    {
+        return numeroNodi;
+    }
+
+    public String charPad(String s, String c, int quanti, boolean aDx)
+    {
+        while (s.length() < quanti)
+            if (aDx)
+                s = s + c;
+            else
+                s = c + s;
+        return s;
+    }
+
+    @Override
+    public String toString()
+    {
+        int i, j;
+        String r = "   "; //-------------------------------------\n" + nodi.toString() + "\n___________________________________________________\n";
+        DecimalFormat df = new DecimalFormat("00");
+        int maxlunghezza = ("|" + numeroNodi).length() + 3;
+        for (i = 0; i < numeroNodi; i++)
+            r = r + charPad("| " + i, " ", maxlunghezza,false);
+        r = r + "\n";
+        
+        for (i = 0; i < 10+maxlunghezza*numeroNodi; i++)
+            r = r + "_";
+        r = r + "\n";
+        
+        
+        for (i = 0; i < numeroNodi; i++)
+        {
+            r = r + charPad(i + ")", " ", maxlunghezza,true) + "|";
+            for (j = 0; j < numeroNodi; j++)
+                r = r + " " + charPad(""+pesi[i][j]," ",maxlunghezza-1,true); //if (j != numeroNodi - 1)
+            //    r = r + ",";
+            r = r + "\n\n\n";
+        }
+        r = r + "___________________________________________________\n";
+        return r;
+    }
+}
