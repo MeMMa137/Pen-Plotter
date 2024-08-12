@@ -290,3 +290,126 @@ public Punto cercaPuntoSuccessivo(int[][] m, Punto da, Punto a)
             for (Lista l : liste.l)
                 l.sistematiConPuntoDiMezzo(p);
     }
+ 
+public void creaNodiDelGrafo(Liste liste)
+    {
+        nodi = new Nodi(liste);
+        int tot = 0;
+        for (Lista l : liste.l)
+            l.aggiungitiA(nodi);
+        liste.stampati();
+    }
+
+    public Grafo creaGrafo()
+    {
+        Grafo grafo = new Grafo(nodi);
+        for (Lista l : liste.l)
+            if (l.idPrimo == -1 || l.idUltimo == -1)
+                System.out.println("Esiste almeno una lista che non ha id del primo o del secondo:" + l.toString());
+            else
+            {
+                int da, a;
+                da = l.idPrimo;
+                a = l.idUltimo;
+                int peso = l.lunghezza;
+                peso = 1;
+                grafo.impostaPeso(peso, da, a);
+                grafo.impostaPeso(peso, a, da);
+                String percorso = l.toString();
+                grafo.impostaPercorso(percorso, da, a);
+                grafo.impostaPercorso(percorso, a, da);
+            }
+        //System.out.println(grafo.toString());
+        grafo = semplifica(grafo);
+        //System.out.println(grafo.toString());
+        return grafo;
+    }
+    
+    public Grafo semplifica(Grafo g){
+        g.riduciAlGrafoEquivalente();
+        return g;
+    }
+    
+    public String navigaR(Grafo g, int nodoAttuale, int nodiNavigati){
+        if (nodiNavigati==g.numeroNodi()-1)
+            return "";
+        Nodo n = nodi.get(nodoAttuale);
+        n.visite++;
+        int[] destinazioni = g.dovePossoAndarePartendoDa(nodoAttuale);
+        int i;
+        for(i=0;i<destinazioni.length;i++)
+        {
+            Nodo nn = nodi.get(destinazioni[i]);
+            if (nn.visite==0){
+                nn.visite++;
+                String rr = navigaR(g, destinazioni[i], nodiNavigati+1);
+                if (rr!="!")
+                    return n.getInfo()+";"+rr;
+            }
+        }
+        return "!";
+    }
+    
+    
+    
+    private void resetVisite(Grafo g, int na, int nn) {
+        if(nn>=g.numeroNodi()) return;
+        Nodo n = g.nodi.get(na);
+        n.visite = 0;
+        int[] d = g.dovePossoAndarePartendoDa(na);
+        for(int i=0;i<d.length; i++)
+            resetVisite(g, d[i], nn+1);
+    }
+    
+    private void aggiungiNodiAccorpati(ArrayList<Nodo> p, Nodo n) {
+        for(Nodo na: n.nodiAccorpati) {
+            p.add(na);
+            aggiungiNodiAccorpati(p, na);
+            p.add(n);
+        }        
+    }
+    
+    public ArrayList<Nodo> navigaRarray(Grafo g, int nodoAttuale, int nodiNavigati){
+        ArrayList<Nodo> p = new ArrayList<>();
+        if (nodiNavigati==g.numeroNodi())
+            return p;
+        Nodo n = g.nodi.get(nodoAttuale);        
+        n.visite++;
+        p.add(n);
+        aggiungiNodiAccorpati(p, n);
+        int[] destinazioni = g.dovePossoAndarePartendoDa(nodoAttuale);
+        for(int i=0;i<destinazioni.length;i++)
+        {
+            Nodo nn = g.nodi.get(destinazioni[i]);
+            if (nn.visite==0){
+                p.addAll(navigaRarray(g, destinazioni[i], nodiNavigati+1));
+                return p;
+            }
+        }
+        return p;
+    }
+    
+    public String navigaGrafo(Grafo gg){
+        return navigaR(gg.clone(),0,0);
+    }
+
+    private ArrayList<Point> agguingiPuntiIntermedi(ArrayList<Point> p) {
+        int n = p.size();
+        ArrayList<Point> pa = new ArrayList<>();
+        if(n==1) {
+            pa.add(p.get(0));
+            return pa;
+        }
+        for(int i=0;i<n;i++) {
+            Point n2 = p.get(i);
+            Point n1 = i<n-1 ? p.get(i+1) : p.get(0);
+            int dx = abs(n1.x - n2.x);
+            int dy = abs(n1.y - n2.y);
+            int ns = dx>dy ? dx : dy;
+            for(int k=0;k<ns;k+=1) {
+                int nk=ns-k;
+                pa.add( new Point( (n1.x*k+n2.x*nk)/ns, (n1.y*k+n2.y*nk)/ns) );
+            }            
+        }
+        return pa;
+    }
