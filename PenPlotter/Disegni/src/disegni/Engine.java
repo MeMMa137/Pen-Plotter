@@ -413,3 +413,39 @@ public void creaNodiDelGrafo(Liste liste)
         }
         return pa;
     }
+    
+public ArrayList<Point> navigaGrafoArray(Grafo gg, boolean puntiIntermedi){
+        Grafo g = gg.clone();
+        resetVisite(g, 0, 0);
+        ArrayList<Nodo> ris=navigaRarray(g,0,0);
+        if(ris.size()>1)
+            ris.add(ris.get(0).clone());
+        ArrayList<Point> pa = new ArrayList<>();
+        for(Nodo n: ris)
+            pa.add(n.toPoint());
+        if(puntiIntermedi)
+            return agguingiPuntiIntermedi(pa);
+        return pa;
+    }
+
+    public void elabora()
+    {
+        Disegni.fps.azzeraPassi();
+        creaRappresentazioneMatrice();
+        rimuoviNeriNonCollegatiA2Pixel();
+        creaListe(cloneArray(m));
+        dst = ricreaRappresentazioneImmagine(m);
+        dstDeiTolti = ricreaRappresentazioneImmagine(matriceDeiTolti);
+        immagineDalleListe = ricreaImmagineDalleListe(liste, m[0].length, m.length);
+        creaPuntiDaRimettere();
+        immagineDeiPuntiRipresi = ricreaImmagineDeiPuntiRipresi(m[0].length, m.length);
+        sistemaListeConPuntiDiMezzo();
+        immagineDalleListe2 = ricreaImmagineDalleListe(liste, m[0].length, m.length);
+        creaNodiDelGrafo(liste);
+        //System.out.println(nodi.toString());
+        grafo = creaGrafo();
+        //String percorso = navigaGrafo(grafo);
+        //System.out.println(percorso);
+    }
+
+}
